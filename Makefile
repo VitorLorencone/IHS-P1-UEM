@@ -27,6 +27,5 @@ run: main$(EXT)
 
 # Clean Rule (> make clean)
 clean:
-	rm -f *.o main$(EXT)
 	$(RM) *.o
 	$(RM) main$(EXT)
