@@ -4,11 +4,11 @@
 #include "edit_distance.h"
 
 // Path to js file, remove comments for other algorithms
-const char *path_js = "./scripts/dld.js";
+//const char *path_js = "./scripts/dld.js";
 //const char *path_js = "./scripts/hamming.js";
 //const char *path_js = "./scripts/jaro.js";
 //const char *path_js = "./scripts/lcs.js";
-//const char *path_js = "./scripts/levenshtein.js";
+const char *path_js = "./scripts/levenshtein.js";
 
 // Function needed for reading a file to a string in C.
 // Duktape v2.x does NOT have support for direct file manipulation for compatibility reasons.

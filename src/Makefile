@@ -1,7 +1,9 @@
 # Variables with OS check
+# -std=c99 needed for better duktape compatibility
 FLAGS = -Wall -std=c99
 OBJS = main.o edit_distance.o duktape.o
 
+# OS pick
 ifeq ($(OS),Windows_NT)
     RM = del /F /Q
     EXT = .exe
