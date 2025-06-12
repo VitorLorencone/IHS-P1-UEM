@@ -1,4 +1,6 @@
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 // levenshtein distance
 int levenshtein_dist(const char *s1, const char *s2);

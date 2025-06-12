@@ -47,21 +47,21 @@ int levenshtein_dist(const char *s1, const char *s2){
 // longest common subsequence
 int lcs_rec(char s1[], char s2[], int m, int n) {
     if (m == 0 || n == 0) return 0;
-    if (s1[m - 1] == s2[n - 1]) return 1 + lcsRec(s1, s2, m - 1, n - 1);
-    else return max(lcsRec(s1, s2, m, n - 1), lcsRec(s1, s2, m - 1, n));
+    if (s1[m - 1] == s2[n - 1]) return 1 + lcs_rec(s1, s2, m - 1, n - 1);
+    else return max(lcs_rec(s1, s2, m, n - 1), lcs_rec(s1, s2, m - 1, n));
 }
 int lcs(char s1[],char s2[]){
     int m = strlen(s1);
     int n = strlen(s2);
     
-    return lcsRec(s1,s2,m,n);
+    return lcs_rec(s1,s2,m,n);
 }
 
 // hamming distance
 int hamming_dist(char s1[], char s2[])
 {
     int i = 0, count = 0;
-    while(strcmp(*s1, "") == 0)
+    while(strcmp(s1, "") == 0)
     {
         if (s1[i] != s2[i])
             count++;
