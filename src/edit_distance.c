@@ -75,7 +75,6 @@ int hamming_dist(const char *s1, const char *s2) {
     return dist;
 }
 
-
 // damerau–levenshtein distance
 int dld (const char *s1, const char *s2)
 {
