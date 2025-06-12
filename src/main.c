@@ -4,11 +4,11 @@
 #include "edit_distance.h"
 
 // Path to js file, remove comments for other algorithms
-//const char *path_js = "./scripts/dld.js";
+const char *path_js = "./scripts/dld.js";
 //const char *path_js = "./scripts/hamming.js";
 //const char *path_js = "./scripts/jaro.js";
 //const char *path_js = "./scripts/lcs.js";
-const char *path_js = "./scripts/levenshtein.js";
+//const char *path_js = "./scripts/levenshtein.js";
 
 // Function needed for reading a file to a string in C.
 // Duktape v2.x does NOT have support for direct file manipulation for compatibility reasons.
@@ -61,11 +61,7 @@ duk_ret_t js_dld(duk_context *ctx){
 duk_ret_t js_hamming_dist(duk_context *ctx){
     const char *s1 = duk_require_string(ctx, 0);
     const char *s2 = duk_require_string(ctx, 1);
-    char s1_var[100];
-    char s2_var[100];
-    strcpy(s1_var, s1);
-    strcpy(s2_var, s2);
-    int dist = hamming_dist(s1_var, s2_var);
+    int dist = hamming_dist(s1, s2);
     duk_push_int(ctx, dist);
     return 1;
 }
@@ -74,8 +70,8 @@ duk_ret_t js_hamming_dist(duk_context *ctx){
 duk_ret_t js_jaro_dist(duk_context *ctx){
     const char *s1 = duk_require_string(ctx, 0);
     const char *s2 = duk_require_string(ctx, 1);
-    int dist = jaro_dist(s1, s2);
-    duk_push_int(ctx, dist);
+    double dist = jaro_dist(s1, s2);
+    duk_push_number(ctx, dist);
     return 1;
 }
 

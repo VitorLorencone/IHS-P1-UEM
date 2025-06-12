@@ -6,6 +6,7 @@
 // https://en.wikipedia.org/wiki/Hamming_distance
 // https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance
 // https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance
+// https://gist.github.com/badocelot/5331587
 
 #include "edit_distance.h"
 
@@ -58,38 +59,117 @@ int lcs(char s1[],char s2[]){
 }
 
 // hamming distance
-int hamming_dist(char s1[], char s2[])
-{
-    int i = 0, count = 0;
-    while(strcmp(s1, "") == 0)
-    {
-        if (s1[i] != s2[i])
-            count++;
-        i++;
+int hamming_dist(const char *s1, const char *s2) {
+    int dist = 0;
+    int len1 = strlen(s1);
+    int len2 = strlen(s2);
+
+    if (len1 != len2) {
+        return -1;
     }
-    return count;
+    for (int i = 0; i < len1; i++) {
+        if (s1[i] != s2[i]) {
+            dist++;
+        }
+    }
+    return dist;
 }
 
+
 // damerau–levenshtein distance
-int dld_rec(const char *s1, const char *s2, int len1, int len2) {
-    if (len1 == 0) return len2;
-    if (len2 == 0) return len1;
-    int cost = (s1[len1 - 1] == s2[len2 - 1]) ? 0 : 1;
-    int res = min3(
-        dld_rec(s1, s2, len1 - 1, len2) + 1,        
-        dld_rec(s1, s2, len1, len2 - 1) + 1,        
-        dld_rec(s1, s2, len1 - 1, len2 - 1) + cost
-    );
-    if (len1 > 1 && len2 > 1 &&
-        s1[len1 - 1] == s2[len2 - 2] &&
-        s1[len1 - 2] == s2[len2 - 1]) {
-        int trans = dld_rec(s1, s2, len1 - 2, len2 - 2) + 1;
-        if (trans < res) res = trans;
+int dld (const char *s1, const char *s2)
+{
+    int m = 0;
+    if (s1 != NULL)
+        m = strlen(s1);
+        
+    int n = 0;
+    if (s2 != NULL)
+        n = strlen(s2);
+    
+    if (m == 0)
+        return n;
+    if (n == 0)
+        return m;
+    
+    int **matrix = (int**) malloc ((m + 2) * sizeof (int*));
+    if (matrix == NULL)
+        abort();
+
+    for (int i = 0; i < m + 2; i++)
+    {
+        matrix[i] = (int*) malloc ((n + 2) * sizeof (int));
+
+        if (matrix[i] == NULL)
+            abort();
     }
-    return res;
-}
-int dld(const char *s1, const char *s2) {
-    return dld_rec(s1, s2, strlen(s1), strlen(s2));
+
+    int INF = m + n;
+    
+    matrix[0][0] = INF;
+    for (int i = 0; i <= m; i++)
+    {
+        matrix[i+1][1] = i;
+        matrix[i+1][0] = INF;
+    }
+    for (int j = 0; j <= n; j++)
+    {
+        matrix[1][j+1] = j;
+        matrix[0][j+1] = INF;
+    }
+
+    int *last_row = (int*) malloc (256 * sizeof (int));
+    
+    for (int d = 0; d < 256; d++)
+        last_row[d] = 0;
+
+    for (int row = 1; row <= m; row++)
+    {
+        unsigned char ch_s = s1[row-1];
+        
+        int last_match_col = 0;
+
+        for (int col = 1; col <= n; col++)
+        {
+
+            unsigned char ch_t = s2[col-1];
+            
+            int last_matching_row = last_row[ch_t];
+
+            int cost = (ch_s == ch_t) ? 0 : 1;
+
+            int dist_add = matrix[row][col+1] + 1;
+            int dist_del = matrix[row+1][col] + 1;
+            int dist_sub = matrix[row][col] + cost;
+            int dist_trans = matrix[last_matching_row][last_match_col]
+                             + (row - last_matching_row - 1) + 1
+                             + (col - last_match_col - 1);
+
+            int min = dist_add;
+            if (dist_del < min)
+                min = dist_del;
+            if (dist_sub < min)
+                min = dist_sub;
+            if (dist_trans < min)
+                min = dist_trans;
+
+            matrix[row+1][col+1] = min;
+
+            if (cost == 0)
+                last_match_col = col;
+        }
+
+        last_row[ch_s] = row;
+    }
+
+    int result = matrix[m+1][n+1];
+    
+    for (int i = 0; i < m + 2; i++)
+        free (matrix[i]);
+    free (matrix);
+    free (last_row);
+
+    return result;
 }
 
 // jaro distance
@@ -140,11 +220,10 @@ double jaro_dist(const char *s1, const char *s2) {
     double m = matches;
     return ((m / len1) + (m / len2) + ((m - t / 2.0) / m)) / 3.0;
 }
-
 double jaro_winkler(const char *s1, const char *s2) {
-    double jaro = jaro_distance(s1, s2);
+    double jaro = jaro_dist(s1, s2);
     int prefix = 0;
-    for (int i = 0; i < MIN(4, MIN(strlen(s1), strlen(s2))); i++) {
+    for (int i = 0; i < min(4, min(strlen(s1), strlen(s2))); i++) {
         if (s1[i] == s2[i]) {
             prefix++;
         } else {
